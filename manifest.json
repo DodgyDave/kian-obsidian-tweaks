@@ -1,0 +1,9 @@
+{
+  "id": "kian-obsidian-tweaks",
+  "name": "Kian's Obsidian Tweaks",
+  "version": "0.1.0",
+  "minAppVersion": "1.5.0",
+  "description": "Bundles Kian's heading effects, Matrix lock screen, and vault edit notifications.",
+  "author": "Kian",
+  "isDesktopOnly": false
+}
