@@ -18,17 +18,14 @@ Kian's Tweaks bundles a few opinionated visual and workflow tweaks for Obsidian:
 ### Matrix Lock Screen
 
 - Locks file-backed views after a configurable idle timeout
+- Uses a 120 second idle timeout by default
 - Collapses sidebars when the lock starts
 - Corrupts the current page with Matrix-style falling glyphs
 - Requires a configurable password to unlock
 
 This is a visual/privacy lock only. It is not encryption, access control, or a security boundary. The passcode is stored in plugin settings and should not be reused as a real password.
 
-Default password:
-
-```text
-matrix
-```
+The default password is `matrix`.
 
 ### Vault Edit Notifications
 
@@ -56,9 +53,9 @@ Until this plugin is available in Obsidian's community plugin browser:
 
 The plugin has one settings page with sections for:
 
-- Heading Tweaks
-- Matrix Lock Screen
-- Vault Edit Notifications
+- Heading Tweaks: enable the custom heading font, heading glow effects, and heading pulse speed.
+- Matrix Lock Screen: enable the idle lock, set the timeout in seconds, and change the unlock password. The default timeout is 120 seconds and the default password is `matrix`.
+- Vault Edit Notifications: enable file explorer notification dots, choose watched folders, clear notifications on open, ignore dotfiles, and customize dot color and opacity.
 
 ## License
 
