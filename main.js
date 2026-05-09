@@ -1096,8 +1096,12 @@ class MatrixRain {
       this.fontSize * 1.1,
       Number.isFinite(parsedLineHeight) ? parsedLineHeight : this.fontSize * 1.25
     );
-    this.gridX = Math.max(0, textRect.left - hostRect.left);
-    this.gridY = Math.max(0, textRect.top - hostRect.top);
+    const textOffsetX = Math.max(0, textRect.left - hostRect.left);
+    const textOffsetY = Math.max(0, textRect.top - hostRect.top);
+    this.gridX =
+      textOffsetX - Math.ceil(textOffsetX / this.columnWidth) * this.columnWidth;
+    this.gridY =
+      textOffsetY - Math.ceil(textOffsetY / this.rowHeight) * this.rowHeight;
   }
 
   resetAnimationState() {
