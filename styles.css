@@ -296,6 +296,37 @@ body.kian-tweaks-heading-effects-enabled
   position: relative;
 }
 
+.nav-file-title.assistant-edit-notifier-unread::before,
+.nav-folder-title.assistant-edit-notifier-unread::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 3px;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(
+        in srgb,
+        var(--assistant-edit-notifier-dot-color, var(--color-blue)) 18%,
+        transparent
+      )
+      0%,
+    color-mix(
+        in srgb,
+        var(--assistant-edit-notifier-dot-color, var(--color-blue)) 12%,
+        transparent
+      )
+      42%,
+    transparent 72%
+  );
+  opacity: 0;
+  transform: translateY(-50%) scale(0.72);
+  animation: assistant-edit-notifier-ring-pulse 4.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
 .nav-file-title.assistant-edit-notifier-unread::after,
 .nav-folder-title.assistant-edit-notifier-unread::after {
   content: "";
@@ -306,8 +337,9 @@ body.kian-tweaks-heading-effects-enabled
   height: 9px;
   border-radius: 50%;
   background: var(--assistant-edit-notifier-dot-color, var(--color-blue));
-  opacity: var(--assistant-edit-notifier-dot-opacity, 0.72);
+  opacity: calc(var(--assistant-edit-notifier-dot-opacity, 0.72) + 0.12);
   transform: translateY(-50%);
+  animation: assistant-edit-notifier-dot-pulse 4.8s ease-in-out infinite;
   pointer-events: none;
 }
 
@@ -318,4 +350,41 @@ body.kian-tweaks-heading-effects-enabled
 
 .assistant-edit-notifier-opacity-setting input[type="range"] {
   accent-color: var(--interactive-accent);
+}
+
+@keyframes assistant-edit-notifier-dot-pulse {
+  0%,
+  100% {
+    transform: translateY(-50%) scale(1);
+    filter: brightness(1.08);
+  }
+
+  45%,
+  55% {
+    transform: translateY(-50%) scale(1.06);
+    filter: brightness(1.18);
+  }
+}
+
+@keyframes assistant-edit-notifier-ring-pulse {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.72);
+  }
+
+  35%,
+  65% {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-file-title.assistant-edit-notifier-unread::before,
+  .nav-folder-title.assistant-edit-notifier-unread::before,
+  .nav-file-title.assistant-edit-notifier-unread::after,
+  .nav-folder-title.assistant-edit-notifier-unread::after {
+    animation: none;
+  }
 }
