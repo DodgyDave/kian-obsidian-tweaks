@@ -1,6 +1,6 @@
-# Kian's Obsidian Tweaks
+# Kian's Tweaks
 
-Kian's Obsidian Tweaks bundles a few opinionated visual and workflow tweaks for Obsidian:
+Kian's Tweaks bundles a few opinionated visual and workflow tweaks for Obsidian:
 
 - Retro heading font and glow effects
 - Matrix-style idle lock screen
@@ -45,12 +45,12 @@ Until this plugin is available in Obsidian's community plugin browser:
 2. Create this folder in your vault:
 
    ```text
-   .obsidian/plugins/kian-obsidian-tweaks/
+   .obsidian/plugins/kian-tweaks/
    ```
 
 3. Place the three files in that folder.
 4. Reload Obsidian.
-5. Enable `Kian's Obsidian Tweaks` under Community plugins.
+5. Enable `Kian's Tweaks` under Community plugins.
 
 ## Settings
 
