@@ -791,7 +791,7 @@ class KianTweaksSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Password")
-      .setDesc("Password required to unlock a locked note.")
+      .setDesc("Passcode required to unlock the visual lock. This is not encryption or real vault security.")
       .addText((text) => {
         text.inputEl.type = "password";
         text

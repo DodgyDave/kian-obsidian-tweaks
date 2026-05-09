@@ -22,6 +22,8 @@ Kian's Obsidian Tweaks bundles a few opinionated visual and workflow tweaks for 
 - Corrupts the current page with Matrix-style falling glyphs
 - Requires a configurable password to unlock
 
+This is a visual/privacy lock only. It is not encryption, access control, or a security boundary. The passcode is stored in plugin settings and should not be reused as a real password.
+
 Default password:
 
 ```text
