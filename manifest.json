@@ -1,7 +1,7 @@
 {
   "id": "kian-tweaks",
   "name": "Kian's Tweaks",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "minAppVersion": "1.5.0",
   "description": "Heading effects, a Matrix-style visual lock screen, and vault edit notifications.",
   "author": "Kian",

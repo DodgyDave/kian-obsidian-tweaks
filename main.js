@@ -257,7 +257,7 @@ module.exports = class KianObsidianTweaksPlugin extends Plugin {
         this.promptOpen = false;
 
         if (!unlocked) {
-          new Notice("Incorrect Matrix page password.");
+          new Notice("Access Denied");
           return;
         }
 
