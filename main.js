@@ -10,11 +10,11 @@ const {
 } = require("obsidian");
 
 const BODY_CLASS = "kian-tweaks-headings-enabled";
-const ACTIVE_CLASS = "ppkm-matrix-active";
-const BLACKOUT_CLASS = "ppkm-matrix-blackout";
-const HOST_CLASS = "ppkm-matrix-host";
-const CANVAS_CLASS = "ppkm-matrix-canvas";
-const UNLOCKING_CLASS = "ppkm-matrix-unlocking";
+const ACTIVE_CLASS = "kian-tweaks-matrix-active";
+const BLACKOUT_CLASS = "kian-tweaks-matrix-blackout";
+const HOST_CLASS = "kian-tweaks-matrix-host";
+const CANVAS_CLASS = "kian-tweaks-matrix-canvas";
+const UNLOCKING_CLASS = "kian-tweaks-matrix-unlocking";
 const UNREAD_CLASS = "assistant-edit-notifier-unread";
 const BLACKOUT_DELAY_MS = 6000;
 const UNLOCK_MAX_MS = 400;
@@ -133,7 +133,7 @@ module.exports = class KianObsidianTweaksPlugin extends Plugin {
     this.clearRenderedDots();
     this.clearNotifierAppearanceSettings();
     document.body.classList.remove(BODY_CLASS);
-    document.body.style.removeProperty("--ppkm-heading-glow-speed");
+    document.body.style.removeProperty("--kian-tweaks-heading-glow-speed");
   }
 
   refreshViews() {
@@ -325,7 +325,7 @@ module.exports = class KianObsidianTweaksPlugin extends Plugin {
       this.settings.headingsEnabled && this.settings.headingEffectsEnabled
     );
     document.body.style.setProperty(
-      "--ppkm-heading-glow-speed",
+      "--kian-tweaks-heading-glow-speed",
       `${Math.max(40, this.settings.headingGlowSpeedMs || 180)}ms`
     );
   }
@@ -714,7 +714,7 @@ class KianTweaksSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Enable heading tweaks")
-      .setDesc("Enable Kian's custom heading font and retro effects.")
+      .setDesc("Enable Kian's custom heading styling and retro effects.")
       .addToggle((toggle) => {
         toggle
           .setValue(this.plugin.settings.headingsEnabled)
@@ -726,7 +726,7 @@ class KianTweaksSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Heading font")
-      .setDesc("Use the DepartureMono/BlexMono heading font stack.")
+      .setDesc("Use Obsidian's text font for headings.")
       .addToggle((toggle) => {
         toggle
           .setValue(this.plugin.settings.headingFontEnabled)
@@ -902,7 +902,7 @@ class PasswordModal extends Modal {
   onOpen() {
     const { contentEl } = this;
     contentEl.empty();
-    contentEl.addClass("ppkm-matrix-unlock-modal");
+    contentEl.addClass("kian-tweaks-matrix-unlock-modal");
     contentEl.createEl("h2", { text: "VAULT LOCKED" });
     contentEl.createEl("p", {
       text: "Access requires operator authentication.",
@@ -915,7 +915,7 @@ class PasswordModal extends Modal {
         type: "password",
       },
     });
-    input.addClass("ppkm-matrix-password-input");
+    input.addClass("kian-tweaks-matrix-password-input");
 
     const submit = () => {
       const expected = this.password || "";
@@ -940,7 +940,7 @@ class PasswordModal extends Modal {
   }
 
   onClose() {
-    this.contentEl.removeClass("ppkm-matrix-unlock-modal");
+    this.contentEl.removeClass("kian-tweaks-matrix-unlock-modal");
     this.contentEl.empty();
 
     if (!this.submitted) {
@@ -961,7 +961,7 @@ class MatrixRain {
       "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン";
     this.kanjiGlyphs = "零壱弐参肆伍陸漆捌玖日月火水木金土空電光影夢無有心門鍵暗雨終始解";
     this.fontSize = 16;
-    this.fontFamily = '"DepartureMono Nerd Font", monospace';
+    this.fontFamily = "monospace";
     this.columnWidth = 10;
     this.rowHeight = 19;
     this.gridX = 0;
@@ -1098,7 +1098,7 @@ class MatrixRain {
     const parsedLineHeight = Number.parseFloat(style.lineHeight);
     const fontSize = Number.isFinite(parsedFontSize) ? parsedFontSize : 16;
     const fontFamily =
-      style.fontFamily || '"DepartureMono Nerd Font", monospace';
+      style.fontFamily || "monospace";
 
     this.fontSize = fontSize;
     this.fontFamily = fontFamily;

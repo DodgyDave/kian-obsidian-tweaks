@@ -1,15 +1,15 @@
-.ppkm-matrix-host {
+.kian-tweaks-matrix-host {
   contain: paint;
   min-height: 100%;
   overflow: hidden !important;
   position: relative !important;
 }
 
-.ppkm-matrix-active > :not(.ppkm-matrix-canvas) {
+.kian-tweaks-matrix-active > :not(.kian-tweaks-matrix-canvas) {
   pointer-events: none !important;
 }
 
-.ppkm-matrix-canvas {
+.kian-tweaks-matrix-canvas {
   background-color: transparent;
   inset: 0;
   opacity: 0;
@@ -19,62 +19,57 @@
   z-index: 9999;
 }
 
-.ppkm-matrix-active > .ppkm-matrix-canvas {
+.kian-tweaks-matrix-active > .kian-tweaks-matrix-canvas {
   opacity: 1;
   pointer-events: auto;
 }
 
-.ppkm-matrix-blackout > .ppkm-matrix-canvas {
+.kian-tweaks-matrix-blackout > .kian-tweaks-matrix-canvas {
   background-color: #000;
 }
 
-.ppkm-matrix-unlocking > .ppkm-matrix-canvas {
+.kian-tweaks-matrix-unlocking > .kian-tweaks-matrix-canvas {
   background-color: transparent;
   opacity: 1;
   pointer-events: none;
   transition: none;
 }
 
-.ppkm-matrix-password-input {
+.kian-tweaks-matrix-password-input {
   background: #000 !important;
   border: 1px solid rgba(92, 255, 137, 0.55) !important;
   color: #5cff89 !important;
-  font-family: var(--font-monospace), "DepartureMono Nerd Font", monospace;
+  font-family: var(--font-monospace), monospace;
   letter-spacing: 0.08em;
   width: 100%;
 }
 
-.ppkm-matrix-unlock-modal {
-  font-family: var(--font-monospace), "DepartureMono Nerd Font", monospace;
+.kian-tweaks-matrix-unlock-modal {
+  font-family: var(--font-monospace), monospace;
 }
 
-.ppkm-matrix-unlock-modal h2 {
+.kian-tweaks-matrix-unlock-modal h2 {
   color: #5cff89;
   letter-spacing: 0.08em;
   margin-bottom: 0.45em;
   text-shadow: 0 0 0.65em rgba(92, 255, 137, 0.55);
 }
 
-.ppkm-matrix-unlock-modal p {
+.kian-tweaks-matrix-unlock-modal p {
   color: var(--text-muted);
   margin-top: 0;
 }
 
 body.kian-tweaks-heading-font-enabled {
-  --ppkm-heading-font: var(
-    --font-text,
-    "DepartureMono Nerd Font",
-    "BlexMono Nerd Font",
-    monospace
-  );
+  --kian-tweaks-heading-font: var(--font-text, var(--font-interface, sans-serif));
 
-  --h1-font: var(--ppkm-heading-font) !important;
-  --h2-font: var(--ppkm-heading-font) !important;
-  --h3-font: var(--ppkm-heading-font) !important;
-  --h4-font: var(--ppkm-heading-font) !important;
-  --h5-font: var(--ppkm-heading-font) !important;
-  --h6-font: var(--ppkm-heading-font) !important;
-  --inline-title-font: var(--ppkm-heading-font) !important;
+  --h1-font: var(--kian-tweaks-heading-font) !important;
+  --h2-font: var(--kian-tweaks-heading-font) !important;
+  --h3-font: var(--kian-tweaks-heading-font) !important;
+  --h4-font: var(--kian-tweaks-heading-font) !important;
+  --h5-font: var(--kian-tweaks-heading-font) !important;
+  --h6-font: var(--kian-tweaks-heading-font) !important;
+  --inline-title-font: var(--kian-tweaks-heading-font) !important;
 }
 
 body.kian-tweaks-heading-font-enabled .inline-title,
@@ -85,16 +80,16 @@ body.kian-tweaks-heading-font-enabled .markdown-rendered h3,
 body.kian-tweaks-heading-font-enabled .markdown-rendered h4,
 body.kian-tweaks-heading-font-enabled .markdown-rendered h5,
 body.kian-tweaks-heading-font-enabled .markdown-rendered h6 {
-  font-family: var(--ppkm-heading-font) !important;
+  font-family: var(--kian-tweaks-heading-font) !important;
 }
 
 body.kian-tweaks-heading-effects-enabled {
-  --ppkm-heading-glow: color-mix(in srgb, var(--text-accent) 26%, transparent);
-  --ppkm-heading-ambient: color-mix(in srgb, var(--text-accent) 14%, transparent);
-  --ppkm-heading-chroma-red: color-mix(in srgb, #ff4f6d 22%, transparent);
-  --ppkm-heading-chroma-cyan: color-mix(in srgb, #5ff4ff 22%, transparent);
-  --ppkm-heading-prefix: color-mix(in srgb, var(--text-accent) 62%, transparent);
-  --ppkm-heading-cursor-speed: 1.25s;
+  --kian-tweaks-heading-glow: color-mix(in srgb, var(--text-accent) 26%, transparent);
+  --kian-tweaks-heading-ambient: color-mix(in srgb, var(--text-accent) 14%, transparent);
+  --kian-tweaks-heading-chroma-red: color-mix(in srgb, #ff4f6d 22%, transparent);
+  --kian-tweaks-heading-chroma-cyan: color-mix(in srgb, #5ff4ff 22%, transparent);
+  --kian-tweaks-heading-prefix: color-mix(in srgb, var(--text-accent) 62%, transparent);
+  --kian-tweaks-heading-cursor-speed: 1.25s;
 }
 
 body.kian-tweaks-heading-effects-enabled .inline-title,
@@ -112,9 +107,9 @@ body.kian-tweaks-heading-effects-enabled
   overflow: visible;
   position: relative;
   text-shadow:
-    0 0 0.18em var(--ppkm-heading-glow),
+    0 0 0.18em var(--kian-tweaks-heading-glow),
     0.04em 0 color-mix(in srgb, var(--text-accent) 8%, transparent);
-  animation: ppkm-heading-text-pulse var(--ppkm-heading-glow-speed) steps(2, end)
+  animation: kian-tweaks-heading-text-pulse var(--kian-tweaks-heading-glow-speed) steps(2, end)
     infinite;
 }
 
@@ -124,11 +119,11 @@ body.kian-tweaks-heading-effects-enabled
   .markdown-source-view.mod-cm6
   .cm-line.HyperMD-header-1
   .cm-header:not(.cm-formatting-header) {
-  animation-name: ppkm-heading-h1-pulse;
+  animation-name: kian-tweaks-heading-h1-pulse;
   text-shadow:
-    -0.035em 0 var(--ppkm-heading-chroma-red),
-    0.035em 0 var(--ppkm-heading-chroma-cyan),
-    0 0 0.18em var(--ppkm-heading-glow),
+    -0.035em 0 var(--kian-tweaks-heading-chroma-red),
+    0.035em 0 var(--kian-tweaks-heading-chroma-cyan),
+    0 0 0.18em var(--kian-tweaks-heading-glow),
     0.04em 0 color-mix(in srgb, var(--text-accent) 8%, transparent);
 }
 
@@ -158,13 +153,13 @@ body.kian-tweaks-heading-effects-enabled
   pointer-events: none;
   background: radial-gradient(
     ellipse at 30% 50%,
-    var(--ppkm-heading-ambient),
+    var(--kian-tweaks-heading-ambient),
     transparent 68%
   );
   filter: blur(0.28em);
   opacity: 0.26;
   transform: translateY(-50%);
-  animation: ppkm-heading-ambient-pulse var(--ppkm-heading-glow-speed) steps(2, end)
+  animation: kian-tweaks-heading-ambient-pulse var(--kian-tweaks-heading-glow-speed) steps(2, end)
     infinite;
 }
 
@@ -174,7 +169,7 @@ body.kian-tweaks-heading-effects-enabled
   .cm-line.HyperMD-header-2
   .cm-header:not(.cm-formatting-header)::after {
   content: " //";
-  color: var(--ppkm-heading-prefix);
+  color: var(--kian-tweaks-heading-prefix);
   font-size: 0.72em;
   font-weight: 500;
   margin-left: 0.34em;
@@ -196,11 +191,11 @@ body.kian-tweaks-heading-effects-enabled
   vertical-align: -0.08em;
   background: currentColor;
   opacity: 0.62;
-  animation: ppkm-heading-cursor-blink var(--ppkm-heading-cursor-speed)
+  animation: kian-tweaks-heading-cursor-blink var(--kian-tweaks-heading-cursor-speed)
     steps(1, end) infinite;
 }
 
-@keyframes ppkm-heading-cursor-blink {
+@keyframes kian-tweaks-heading-cursor-blink {
   0%,
   48% {
     opacity: 0.72;
@@ -212,7 +207,7 @@ body.kian-tweaks-heading-effects-enabled
   }
 }
 
-@keyframes ppkm-heading-ambient-pulse {
+@keyframes kian-tweaks-heading-ambient-pulse {
   0%,
   100% {
     opacity: 0.12;
@@ -227,7 +222,7 @@ body.kian-tweaks-heading-effects-enabled
   }
 }
 
-@keyframes ppkm-heading-text-pulse {
+@keyframes kian-tweaks-heading-text-pulse {
   0%,
   100% {
     text-shadow:
@@ -237,12 +232,12 @@ body.kian-tweaks-heading-effects-enabled
 
   50% {
     text-shadow:
-      0 0 0.18em var(--ppkm-heading-glow),
+      0 0 0.18em var(--kian-tweaks-heading-glow),
       0.04em 0 color-mix(in srgb, var(--text-accent) 9%, transparent);
   }
 }
 
-@keyframes ppkm-heading-h1-pulse {
+@keyframes kian-tweaks-heading-h1-pulse {
   0%,
   100% {
     text-shadow:
@@ -254,9 +249,9 @@ body.kian-tweaks-heading-effects-enabled
 
   50% {
     text-shadow:
-      -0.035em 0 var(--ppkm-heading-chroma-red),
-      0.035em 0 var(--ppkm-heading-chroma-cyan),
-      0 0 0.18em var(--ppkm-heading-glow),
+      -0.035em 0 var(--kian-tweaks-heading-chroma-red),
+      0.035em 0 var(--kian-tweaks-heading-chroma-cyan),
+      0 0 0.18em var(--kian-tweaks-heading-glow),
       0.04em 0 color-mix(in srgb, var(--text-accent) 9%, transparent);
   }
 }
