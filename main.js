@@ -246,6 +246,10 @@ module.exports = class KianObsidianTweaksPlugin extends Plugin {
     }
   }
 
+  hasOpenModal() {
+    return Boolean(document.querySelector(".modal-container, .modal"));
+  }
+
   showPasswordPrompt() {
     if (this.promptOpen) return;
 
@@ -951,8 +955,11 @@ class MatrixRain {
     this.plugin = plugin;
     this.canvas = hostEl.createEl("canvas", { cls: CANVAS_CLASS });
     this.context = this.canvas.getContext("2d");
-    this.glyphs =
+    this.primaryGlyphs =
       "01ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz#$%&*+-/=<>[]{}";
+    this.kanaGlyphs =
+      "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン";
+    this.kanjiGlyphs = "零壱弐参肆伍陸漆捌玖日月火水木金土空電光影夢無有心門鍵暗雨終始解";
     this.fontSize = 16;
     this.fontFamily = '"DepartureMono Nerd Font", monospace';
     this.columnWidth = 10;
@@ -995,6 +1002,11 @@ class MatrixRain {
 
   activate() {
     if (this.active || this.unlocking) return;
+
+    if (this.plugin.hasOpenModal()) {
+      this.resetIdleTimer();
+      return;
+    }
 
     this.plugin.collapseSidebars();
     this.active = true;
@@ -1213,7 +1225,15 @@ class MatrixRain {
   }
 
   randomGlyph() {
-    return this.glyphs[Math.floor(Math.random() * this.glyphs.length)];
+    const roll = Math.random();
+    const glyphs =
+      roll < 0.72
+        ? this.primaryGlyphs
+        : roll < 0.94
+          ? this.kanaGlyphs
+          : this.kanjiGlyphs;
+
+    return glyphs[Math.floor(Math.random() * glyphs.length)];
   }
 
   snapY(y) {
