@@ -10,13 +10,17 @@ const {
 } = require("obsidian");
 
 const BODY_CLASS = "kian-tweaks-headings-enabled";
+const MODAL_GLITCH_CLASS = "kian-tweaks-modal-glitch-enabled";
+const MATRIX_LOCKED_BODY_CLASS = "kian-tweaks-matrix-window-locked";
 const ACTIVE_CLASS = "kian-tweaks-matrix-active";
 const BLACKOUT_CLASS = "kian-tweaks-matrix-blackout";
 const HOST_CLASS = "kian-tweaks-matrix-host";
 const CANVAS_CLASS = "kian-tweaks-matrix-canvas";
+const WINDOW_CANVAS_CLASS = "kian-tweaks-matrix-window-canvas";
 const UNLOCKING_CLASS = "kian-tweaks-matrix-unlocking";
 const UNREAD_CLASS = "assistant-edit-notifier-unread";
 const BLACKOUT_DELAY_MS = 6000;
+const MATRIX_FRAME_INTERVAL_MS = 33;
 const UNLOCK_MAX_MS = 400;
 const UNLOCK_MIN_MS = 200;
 const DEFAULT_SETTINGS = {
@@ -24,6 +28,7 @@ const DEFAULT_SETTINGS = {
   headingFontEnabled: true,
   headingEffectsEnabled: true,
   headingGlowSpeedMs: 180,
+  modalGlitchEnabled: true,
   matrixEnabled: true,
   matrixPassword: "matrix",
   matrixTimeoutSeconds: 120,
@@ -46,6 +51,7 @@ module.exports = class KianObsidianTweaksPlugin extends Plugin {
     this.changedFolders = new Set(this.settings.changedFolders || []);
     this.internalChangedPaths = new Map();
     this.restoreVaultPatches = [];
+    this.activeMatrixInstance = null;
     this.observer = null;
     this.renderTimer = null;
     this.saveTimer = null;
@@ -54,6 +60,7 @@ module.exports = class KianObsidianTweaksPlugin extends Plugin {
     this.boundHandleActivity = () => this.handleActivity();
 
     this.applyHeadingSettings();
+    this.applyModalGlitchSettings();
     this.applyNotifierAppearanceSettings();
     this.patchVaultWriteMethods();
     this.addSettingTab(new KianTweaksSettingTab(this.app, this));
@@ -133,6 +140,8 @@ module.exports = class KianObsidianTweaksPlugin extends Plugin {
     this.clearRenderedDots();
     this.clearNotifierAppearanceSettings();
     document.body.classList.remove(BODY_CLASS);
+    document.body.classList.remove(MODAL_GLITCH_CLASS);
+    document.body.classList.remove(MATRIX_LOCKED_BODY_CLASS);
     document.body.style.removeProperty("--kian-tweaks-heading-glow-speed");
   }
 
@@ -207,6 +216,7 @@ module.exports = class KianObsidianTweaksPlugin extends Plugin {
 
     instance.destroy();
     this.instances.delete(contentEl);
+    this.updateMatrixChromeState();
   }
 
   handleUserInput(event) {
@@ -279,6 +289,7 @@ module.exports = class KianObsidianTweaksPlugin extends Plugin {
     this.settings.dotOpacity = this.clampOpacity(this.settings.dotOpacity);
     await this.saveNow();
     this.applyHeadingSettings();
+    this.applyModalGlitchSettings();
     this.applyNotifierAppearanceSettings();
     this.renderDotsSoon();
     for (const instance of this.instances.values()) {
@@ -330,6 +341,13 @@ module.exports = class KianObsidianTweaksPlugin extends Plugin {
     );
   }
 
+  applyModalGlitchSettings() {
+    document.body.classList.toggle(
+      MODAL_GLITCH_CLASS,
+      this.settings.modalGlitchEnabled
+    );
+  }
+
   collapseSidebars() {
     for (const split of [
       this.app.workspace.leftSplit,
@@ -341,6 +359,33 @@ module.exports = class KianObsidianTweaksPlugin extends Plugin {
         split.collapse();
       }
     }
+  }
+
+  updateMatrixChromeState() {
+    const isLocked = Boolean(
+      this.activeMatrixInstance &&
+        (this.activeMatrixInstance.active || this.activeMatrixInstance.unlocking)
+    );
+    document.body.classList.toggle(MATRIX_LOCKED_BODY_CLASS, isLocked);
+  }
+
+  activateMatrixInstance(instance) {
+    if (
+      this.activeMatrixInstance &&
+      this.activeMatrixInstance !== instance
+    ) {
+      this.activeMatrixInstance.deactivate();
+    }
+
+    this.activeMatrixInstance = instance;
+    this.updateMatrixChromeState();
+  }
+
+  clearMatrixInstance(instance) {
+    if (this.activeMatrixInstance === instance) {
+      this.activeMatrixInstance = null;
+    }
+    this.updateMatrixChromeState();
   }
 
   registerVaultEvents() {
@@ -762,6 +807,18 @@ class KianTweaksSettingTab extends PluginSettingTab {
           });
       });
 
+    new Setting(containerEl)
+      .setName("Modal glitch")
+      .setDesc("Glitch-shake modals, command pickers, and QuickAdd prompts when they open.")
+      .addToggle((toggle) => {
+        toggle
+          .setValue(this.plugin.settings.modalGlitchEnabled)
+          .onChange(async (value) => {
+            this.plugin.settings.modalGlitchEnabled = value;
+            await this.plugin.saveSettings();
+          });
+      });
+
     containerEl.createEl("h2", { text: "Matrix Lock Screen" });
 
     new Setting(containerEl)
@@ -967,9 +1024,10 @@ class MatrixRain {
     this.gridX = 0;
     this.gridY = 0;
     this.corruptedCells = new Map();
-    this.maxTrails = 1200;
+    this.maxTrails = 520;
     this.trails = [];
     this.active = false;
+    this.canvasInBody = false;
     this.blackoutTimer = 0;
     this.idleTimer = 0;
     this.unlocking = false;
@@ -977,6 +1035,7 @@ class MatrixRain {
     this.unlockStartedAt = 0;
     this.unlockTimer = 0;
     this.lastFrame = performance.now();
+    this.lastDrawAt = 0;
     this.animationFrame = 0;
     this.resizeObserver = new ResizeObserver(() => this.resize());
 
@@ -984,7 +1043,6 @@ class MatrixRain {
     this.resizeObserver.observe(this.hostEl);
     this.resize();
     this.draw = this.draw.bind(this);
-    this.animationFrame = requestAnimationFrame(this.draw);
     this.resetIdleTimer();
   }
 
@@ -1010,14 +1068,19 @@ class MatrixRain {
 
     this.plugin.collapseSidebars();
     this.active = true;
+    this.plugin.activateMatrixInstance(this);
+    this.moveCanvasToBody();
     this.resetAnimationState();
     this.hostEl.addClass(ACTIVE_CLASS);
+    this.canvas.addClass(ACTIVE_CLASS);
     this.blackoutTimer = window.setTimeout(() => {
       if (this.active) {
         this.hostEl.addClass(BLACKOUT_CLASS);
+        this.canvas.addClass(BLACKOUT_CLASS);
       }
     }, BLACKOUT_DELAY_MS);
     this.resize();
+    this.startDrawing();
   }
 
   deactivate() {
@@ -1032,7 +1095,13 @@ class MatrixRain {
     this.hostEl.removeClass(ACTIVE_CLASS);
     this.hostEl.removeClass(BLACKOUT_CLASS);
     this.hostEl.removeClass(UNLOCKING_CLASS);
+    this.canvas.removeClass(ACTIVE_CLASS);
+    this.canvas.removeClass(BLACKOUT_CLASS);
+    this.canvas.removeClass(UNLOCKING_CLASS);
     this.context.clearRect(0, 0, this.width, this.height);
+    this.stopDrawing();
+    this.moveCanvasToHost();
+    this.plugin.clearMatrixInstance(this);
   }
 
   unlock() {
@@ -1050,6 +1119,12 @@ class MatrixRain {
     this.hostEl.addClass(UNLOCKING_CLASS);
     this.hostEl.removeClass(ACTIVE_CLASS);
     this.hostEl.removeClass(BLACKOUT_CLASS);
+    this.canvas.addClass(UNLOCKING_CLASS);
+    this.canvas.removeClass(ACTIVE_CLASS);
+    this.canvas.removeClass(BLACKOUT_CLASS);
+    this.moveCanvasToBody();
+    this.plugin.updateMatrixChromeState();
+    this.startDrawing();
 
     this.unlockTimer = window.setTimeout(() => {
       this.finishUnlock();
@@ -1065,12 +1140,50 @@ class MatrixRain {
     this.corruptedCells.clear();
     this.trails = [];
     this.hostEl.removeClass(UNLOCKING_CLASS);
+    this.canvas.removeClass(UNLOCKING_CLASS);
     this.context.clearRect(0, 0, this.width, this.height);
+    this.stopDrawing();
+    this.moveCanvasToHost();
+    this.plugin.clearMatrixInstance(this);
     this.resetIdleTimer();
   }
 
+  moveCanvasToBody() {
+    if (this.canvasInBody) return;
+
+    this.canvas.addClass(WINDOW_CANVAS_CLASS);
+    document.body.appendChild(this.canvas);
+    this.canvasInBody = true;
+  }
+
+  moveCanvasToHost() {
+    if (!this.canvasInBody) return;
+
+    this.canvas.removeClass(WINDOW_CANVAS_CLASS);
+    this.hostEl.appendChild(this.canvas);
+    this.canvasInBody = false;
+  }
+
+  startDrawing() {
+    if (this.animationFrame) return;
+
+    this.lastFrame = performance.now();
+    this.lastDrawAt = 0;
+    this.animationFrame = requestAnimationFrame(this.draw);
+  }
+
+  stopDrawing() {
+    if (!this.animationFrame) return;
+
+    cancelAnimationFrame(this.animationFrame);
+    this.animationFrame = 0;
+  }
+
   resize() {
-    const rect = this.hostEl.getBoundingClientRect();
+    const rect =
+      this.active || this.unlocking
+        ? { width: window.innerWidth, height: window.innerHeight }
+        : this.hostEl.getBoundingClientRect();
     const pixelRatio = window.devicePixelRatio || 1;
     this.width = Math.max(1, Math.floor(rect.width));
     this.height = Math.max(1, Math.floor(rect.height));
@@ -1079,10 +1192,35 @@ class MatrixRain {
     this.canvas.style.width = `${this.width}px`;
     this.canvas.style.height = `${this.height}px`;
     this.context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-    this.syncGridToPage();
+    if (this.active || this.unlocking) {
+      this.syncGridToViewport();
+    } else {
+      this.syncGridToPage();
+    }
     this.pruneCorruptedCells();
 
     this.resetDrops();
+  }
+
+  syncGridToViewport() {
+    const textEl =
+      this.hostEl.querySelector(".cm-content") ||
+      this.hostEl.querySelector(".markdown-preview-sizer") ||
+      this.hostEl.querySelector(".canvas-wrapper") ||
+      this.hostEl;
+    const style = window.getComputedStyle(textEl);
+    const parsedFontSize = Number.parseFloat(style.fontSize);
+    const parsedLineHeight = Number.parseFloat(style.lineHeight);
+    this.fontSize = Number.isFinite(parsedFontSize) ? parsedFontSize : 16;
+    this.fontFamily = style.fontFamily || "monospace";
+    this.context.font = `${this.fontSize}px ${this.fontFamily}`;
+    this.columnWidth = Math.max(6, this.context.measureText("0").width);
+    this.rowHeight = Math.max(
+      this.fontSize * 1.1,
+      Number.isFinite(parsedLineHeight) ? parsedLineHeight : this.fontSize * 1.25
+    );
+    this.gridX = 0;
+    this.gridY = 0;
   }
 
   syncGridToPage() {
@@ -1123,6 +1261,8 @@ class MatrixRain {
     this.lastFrame = performance.now();
     this.hostEl.removeClass(BLACKOUT_CLASS);
     this.hostEl.removeClass(UNLOCKING_CLASS);
+    this.canvas.removeClass(BLACKOUT_CLASS);
+    this.canvas.removeClass(UNLOCKING_CLASS);
     window.clearTimeout(this.blackoutTimer);
     window.clearTimeout(this.unlockTimer);
     this.context.clearRect(0, 0, this.width, this.height);
@@ -1163,15 +1303,28 @@ class MatrixRain {
   }
 
   draw(now) {
+    if (
+      this.lastDrawAt &&
+      now - this.lastDrawAt < MATRIX_FRAME_INTERVAL_MS
+    ) {
+      this.animationFrame = requestAnimationFrame(this.draw);
+      return;
+    }
+
     const delta = Math.min(64, now - this.lastFrame);
     this.lastFrame = now;
+    this.lastDrawAt = now;
 
     if (!this.active) {
       if (this.unlocking) {
         this.drawUnlock(now);
       }
 
-      this.animationFrame = requestAnimationFrame(this.draw);
+      if (this.active || this.unlocking) {
+        this.animationFrame = requestAnimationFrame(this.draw);
+      } else {
+        this.animationFrame = 0;
+      }
       return;
     }
 
@@ -1221,7 +1374,11 @@ class MatrixRain {
       }
     }
 
-    this.animationFrame = requestAnimationFrame(this.draw);
+    if (this.active || this.unlocking) {
+      this.animationFrame = requestAnimationFrame(this.draw);
+    } else {
+      this.animationFrame = 0;
+    }
   }
 
   randomGlyph() {
@@ -1452,16 +1609,26 @@ class MatrixRain {
   }
 
   destroy() {
+    this.active = false;
+    this.unlocking = false;
     window.clearTimeout(this.blackoutTimer);
     window.clearTimeout(this.idleTimer);
     window.clearTimeout(this.unlockTimer);
-    cancelAnimationFrame(this.animationFrame);
+    this.stopDrawing();
     this.resizeObserver.disconnect();
+    if (this.canvasInBody) {
+      this.canvas.removeClass(WINDOW_CANVAS_CLASS);
+      this.canvasInBody = false;
+    }
     this.canvas.remove();
     this.hostEl.removeClass(HOST_CLASS);
     this.hostEl.removeClass(ACTIVE_CLASS);
     this.hostEl.removeClass(BLACKOUT_CLASS);
     this.hostEl.removeClass(UNLOCKING_CLASS);
+    this.canvas.removeClass(ACTIVE_CLASS);
+    this.canvas.removeClass(BLACKOUT_CLASS);
+    this.canvas.removeClass(UNLOCKING_CLASS);
     this.unlockColumns.clear();
+    this.plugin.clearMatrixInstance(this);
   }
 }

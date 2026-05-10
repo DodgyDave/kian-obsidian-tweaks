@@ -5,6 +5,37 @@
   position: relative !important;
 }
 
+.kian-tweaks-matrix-host.kian-tweaks-matrix-active,
+.kian-tweaks-matrix-host.kian-tweaks-matrix-unlocking {
+  contain: none;
+  overflow: visible !important;
+}
+
+body.kian-tweaks-matrix-window-locked .titlebar,
+body.kian-tweaks-matrix-window-locked .mod-root .workspace-tab-header-container,
+body.kian-tweaks-matrix-window-locked .workspace-ribbon,
+body.kian-tweaks-matrix-window-locked .workspace-tab-header-container,
+body.kian-tweaks-matrix-window-locked .workspace-tab-header-container-inner,
+body.kian-tweaks-matrix-window-locked .workspace-tab-header-new-tab,
+body.kian-tweaks-matrix-window-locked .workspace-tab-header-tab-list,
+body.kian-tweaks-matrix-window-locked .workspace-leaf-header,
+body.kian-tweaks-matrix-window-locked .view-header,
+body.kian-tweaks-matrix-window-locked .status-bar,
+body.kian-tweaks-matrix-window-locked .status-bar-item,
+body.kian-tweaks-matrix-window-locked .workspace-sidedock-vault-profile {
+  opacity: 0;
+  pointer-events: none;
+}
+
+body.kian-tweaks-matrix-window-locked .modal-container,
+body.kian-tweaks-matrix-window-locked .modal,
+body.kian-tweaks-matrix-window-locked .prompt,
+body.kian-tweaks-matrix-window-locked .prompt-container,
+body.kian-tweaks-matrix-window-locked .suggestion-container,
+body.kian-tweaks-matrix-window-locked .popover {
+  z-index: 10000;
+}
+
 .kian-tweaks-matrix-active > :not(.kian-tweaks-matrix-canvas) {
   pointer-events: none !important;
 }
@@ -20,11 +51,48 @@
 }
 
 .kian-tweaks-matrix-active > .kian-tweaks-matrix-canvas {
+  height: 100vh !important;
+  left: 0;
   opacity: 1;
   pointer-events: auto;
+  position: fixed;
+  top: 0;
+  width: 100vw !important;
+  z-index: 9999;
+}
+
+.kian-tweaks-matrix-window-canvas {
+  height: 100vh !important;
+  left: 0;
+  opacity: 1;
+  pointer-events: auto;
+  position: fixed !important;
+  top: 0;
+  width: 100vw !important;
+  z-index: 999;
+}
+
+.kian-tweaks-matrix-unlocking > .kian-tweaks-matrix-canvas {
+  height: 100vh !important;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100vw !important;
+  z-index: 9999;
+}
+
+.kian-tweaks-matrix-window-canvas.kian-tweaks-matrix-unlocking {
+  background-color: transparent;
+  opacity: 1;
+  pointer-events: none;
+  transition: none;
 }
 
 .kian-tweaks-matrix-blackout > .kian-tweaks-matrix-canvas {
+  background-color: #000;
+}
+
+.kian-tweaks-matrix-window-canvas.kian-tweaks-matrix-blackout {
   background-color: #000;
 }
 
@@ -44,6 +112,18 @@
   width: 100%;
 }
 
+body.kian-tweaks-modal-glitch-enabled .modal .modal-content,
+body.kian-tweaks-modal-glitch-enabled .prompt,
+body.kian-tweaks-modal-glitch-enabled .prompt-container,
+body.kian-tweaks-modal-glitch-enabled .suggestion-container,
+body.kian-tweaks-modal-glitch-enabled .suggestion,
+body.kian-tweaks-modal-glitch-enabled .popover,
+body.kian-tweaks-modal-glitch-enabled .quickAddModal .modal,
+body.kian-tweaks-modal-glitch-enabled .quickadd-choice-suggestion,
+body.kian-tweaks-modal-glitch-enabled .kian-tweaks-matrix-unlock-modal {
+  animation: kian-tweaks-matrix-modal-glitch 90ms steps(2, end);
+}
+
 .kian-tweaks-matrix-unlock-modal {
   font-family: var(--font-monospace), monospace;
 }
@@ -58,6 +138,47 @@
 .kian-tweaks-matrix-unlock-modal p {
   color: var(--text-muted);
   margin-top: 0;
+}
+
+@keyframes kian-tweaks-matrix-modal-glitch {
+  0% {
+    filter: hue-rotate(0deg) contrast(1);
+    transform: translateX(0) scale(1);
+  }
+
+  20% {
+    filter: hue-rotate(34deg) contrast(1.35);
+    transform: translateX(-72px) scaleX(1.16) skewX(-32deg);
+  }
+
+  40% {
+    filter: hue-rotate(-28deg) contrast(1.25);
+    transform: translateX(60px) translateY(-8px) scaleY(0.92) skewX(28deg);
+  }
+
+  70% {
+    filter: hue-rotate(18deg) contrast(1.16);
+    transform: translateX(-36px) translateY(4px) scaleX(1.08) skewX(-16deg);
+  }
+
+  100% {
+    filter: hue-rotate(0deg) contrast(1);
+    transform: translateX(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.kian-tweaks-modal-glitch-enabled .modal .modal-content,
+  body.kian-tweaks-modal-glitch-enabled .prompt,
+  body.kian-tweaks-modal-glitch-enabled .prompt-container,
+  body.kian-tweaks-modal-glitch-enabled .suggestion-container,
+  body.kian-tweaks-modal-glitch-enabled .suggestion,
+  body.kian-tweaks-modal-glitch-enabled .popover,
+  body.kian-tweaks-modal-glitch-enabled .quickAddModal .modal,
+  body.kian-tweaks-modal-glitch-enabled .quickadd-choice-suggestion,
+  body.kian-tweaks-modal-glitch-enabled .kian-tweaks-matrix-unlock-modal {
+    animation: none;
+  }
 }
 
 body.kian-tweaks-heading-font-enabled {
